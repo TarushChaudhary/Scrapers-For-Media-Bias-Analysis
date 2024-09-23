@@ -1,0 +1,10 @@
+Financial Express- newspaper
+news18- newspaper
+the hindu- newspaper
+hindustantimes- newspaper(remove also read)
+indianexpress- bf + selenium, filter through title for top © for bottom
+economictimes.indiatimes - newspaper, some cleaning at bottom
+ndtv - newspaper
+thenewindianexpress - bf + selenium, tough filtering top and bottom.
+opindia - newspaper
+
