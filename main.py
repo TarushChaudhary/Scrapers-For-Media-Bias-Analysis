@@ -1,5 +1,5 @@
 import streamlit as st
-from scraper import scrape_website, extract_body_content, clean_body_content, split_into_sections
+from BS4scraper import scrape_website, extract_body_content, clean_body_content, split_into_sections
 from bs4 import BeautifulSoup
 from dataprocessing import get_title_by_url
 

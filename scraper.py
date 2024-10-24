@@ -1,52 +1,37 @@
-import selenium.webdriver as webdriver
-from selenium.webdriver.chrome.service import Service
-from bs4 import BeautifulSoup
-from dataprocessing import get_title_by_url
+from newspaper import Article
+from cleaning import ProcessOutlet
 
+outlets = ["economictimes","hindustantimes","financialexpress","thehindu","ndtv","news18"]
+class Scraper:
+    def __init__(self, url):
+        self.url = url
+        self.outlet = url.split(".")[1]
+        self.article = Article(url)
+        self.article.download()
+        self.article.parse()
 
-def scrape_website(url):
-    print("Launching Chrome Browser...")
-    chrome_driver_path = "./chromedriver.exe"
-    options = webdriver.ChromeOptions()
-    driver = webdriver.Chrome(service=Service(chrome_driver_path), options=options)
+    def get_title(self):
+        return self.article.title
 
-    try:
-        driver.get(url)
-        print("page loaded")
-        html = driver.page_source
-        return html
-    except Exception as e:
-        print("An error occurred: ", e)
-    finally:
-        driver.quit()
-        print("Browser closed")
+    def get_raw_text(self):
+        return self.article.text
 
-
-
-def extract_body_content(html):
-    soup = BeautifulSoup(html, 'html.parser')
-    body_content = soup.body
-    if body_content:
-        return body_content.get_text(strip=True)
-    else:
-        return "No body content found"
+    def get_summary(self):
+        return self.article.summary
     
-def clean_body_content(text, url):
-    soup = BeautifulSoup(text, 'html.parser')
-
-    for script_or_style in soup(['script', 'style']):
-        script_or_style.extract()
-
-    cleaned_text = soup.get_text(separator="\n")
-    
-    if "thehindu.com" in url:
-        read_comments_index = cleaned_text.find("Read Comments")
-        if read_comments_index != -1:
-            cleaned_text = cleaned_text[:read_comments_index]
-    
-    cleaned_content = "\n".join([line.strip() for line in cleaned_text.splitlines() if line.strip()])
-    
-    return cleaned_content
-
-def split_into_sections(text, max_length=8000):
-    return [text[i:i+max_length] for i in range(0, len(text), max_length)]
+    def get_clean_text(self):
+        processed_text = ProcessOutlet(self.outlet, self.article.text)
+        if self.outlet == "economictimes":
+            return processed_text.ProcessEconomictimes()
+        elif self.outlet == "hindustantimes":
+            return processed_text.ProcessHindustantimes()
+        elif self.outlet == "financialexpress":
+            return processed_text.ProcessFinancialexpress()
+        elif self.outlet == "thehindu":
+            return processed_text.ProcessThehindu()
+        elif self.outlet == "ndtv":
+            return processed_text.ProcessNDTV()
+        elif self.outlet == "news18":
+            return processed_text.ProcessNews18()
+        else:
+            return processed_text.ProcessUnknown()            
