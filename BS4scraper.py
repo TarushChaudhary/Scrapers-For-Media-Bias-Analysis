@@ -1,8 +1,6 @@
 import selenium.webdriver as webdriver
 from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
-from dataprocessing import get_title_by_url
-
 
 def scrape_website(url):
     print("Launching Chrome Browser...")
@@ -21,7 +19,9 @@ def scrape_website(url):
         driver.quit()
         print("Browser closed")
 
-
+def extract_title(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    return soup.title.string
 
 def extract_body_content(html):
     soup = BeautifulSoup(html, 'html.parser')
@@ -38,7 +38,9 @@ def clean_body_content(text, url):
         script_or_style.extract()
 
     cleaned_text = soup.get_text(separator="\n")
-    
+    if "hindustantimes.com" in url:
+        title = soup.title.string
+        cleaned_text = cleaned_text.split(title, 1)[-1].strip()
     if "thehindu.com" in url:
         read_comments_index = cleaned_text.find("Read Comments")
         if read_comments_index != -1:
